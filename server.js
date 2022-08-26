@@ -7,6 +7,6 @@ app.use(express.json());
 
 require('dotenv/config');
 
-app.listen(3333, () => {
+app.listen(process.env.PORT, () => {
   console.log("Servidor iniciado corretamente");
-})
+});
