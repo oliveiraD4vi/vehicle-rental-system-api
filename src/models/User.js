@@ -34,6 +34,10 @@ const User = db.define('users', {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'CLIENT'
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 
