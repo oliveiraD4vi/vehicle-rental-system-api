@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../../models/User');
+const PersonalData = require('../../models/PersonalData');
 
 module.exports = (app) => {
   app.post('/register', async (req, res) => {
@@ -17,9 +18,23 @@ module.exports = (app) => {
     }
 
     data.password = await bcrypt.hash(data.password, 8);
+    
+    const userData = {
+      role: data.role,
+      email: data.email,
+      password: data.password,
+      personaldata_id: null
+    }
 
     try {
-      await User.create(data);
+      await PersonalData.create({
+        name: data.name,
+        cpf: data.cpf,
+        bornAt: data.bornAt
+      }).then((e) => {
+        userData.personaldata_id = e.id;
+      })
+      await User.create(userData);
       return res.json({
         error: false,
         message: 'Usuário cadastrado com sucesso!'
@@ -34,7 +49,7 @@ module.exports = (app) => {
 
   app.post('/login', async (req, res) => {
     const user = await User.findOne({
-      attributes: ['id', 'name', 'email', 'cpf', 'password', 'role', 'bornAt'],
+      attributes: ['id', 'email', 'password', 'role'],
       where: {
         email: req.body.email
       }

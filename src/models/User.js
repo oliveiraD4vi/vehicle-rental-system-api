@@ -1,6 +1,8 @@
 const { DataTypes } = require('sequelize');
 const db = require('./database');
 
+const PersonalData = require('./PersonalData');
+
 const User = db.define('users', {
   id: {
     type: DataTypes.INTEGER,
@@ -8,16 +10,7 @@ const User = db.define('users', {
     allowNull: false,
     primaryKey: true
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  cpf: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true
@@ -26,18 +19,18 @@ const User = db.define('users', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  bornAt: {
-    type: DataTypes.DATE,
-    allowNull: false
-  },
   role: {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'CLIENT'
   },
-  phone: {
-    type: DataTypes.STRING,
-    allowNull: true
+  personaldata_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: PersonalData,
+      key: 'id'
+    }
   }
 });
 

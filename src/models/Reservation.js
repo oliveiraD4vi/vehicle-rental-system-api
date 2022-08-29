@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('./database');
-const PersonalData = require('./PersonalData');
 
+const User = require('./User');
 const Vehicle = require('./Vehicle');
 
 const Reservation = db.define('reservations', {
@@ -10,6 +10,14 @@ const Reservation = db.define('reservations', {
     autoIncrement: true,
     allowNull: false,
     primaryKey: true
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id'
+    }
   },
   vehicle_id: {
     type: DataTypes.INTEGER,
@@ -27,14 +35,6 @@ const Reservation = db.define('reservations', {
     type: DataTypes.DATE,
     allowNull: false
   },
-  personal_data: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: PersonalData,
-      key: 'id'
-    }
-  },
   step: {
     type: DataTypes.STRING,
     allowNull: false
@@ -47,6 +47,6 @@ const Reservation = db.define('reservations', {
 });
 
 // Create table
-// User.sync({ alter: true });
+// Reservation.sync({ alter: true });
 
 module.exports = Reservation;
