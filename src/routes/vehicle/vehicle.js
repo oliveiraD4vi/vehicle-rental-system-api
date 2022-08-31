@@ -1,9 +1,7 @@
-const { authUser } = require('../../middlewares/auth');
-
 const Vehicle = require('../../models/Vehicle');
 
 module.exports = (app) => {
-  app.get('/cars', authUser, async (req, res) => {
+  app.get('/cars', async (req, res) => {
     await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'inventory', 'value']
     })
@@ -11,7 +9,7 @@ module.exports = (app) => {
       if (cars.length > 0) {
         return res.json({
           error: false,
-          cars,
+          cars: Object.values(cars),
         });
       } else {
         return res.status(400).json({
