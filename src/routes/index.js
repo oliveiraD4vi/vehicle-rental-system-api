@@ -1,7 +1,7 @@
 const UserRoutes = require('./user/user');
-const VechiclesRoutes = require('./vehicle/vehicle');
+const VechicleRoutes = require('./vehicle/vehicle');
 
 module.exports = (app) => {
   UserRoutes(app);
-  VechiclesRoutes(app);
+  VechicleRoutes(app);
 };

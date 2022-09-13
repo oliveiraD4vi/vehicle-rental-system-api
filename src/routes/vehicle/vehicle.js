@@ -1,7 +1,7 @@
 const Vehicle = require('../../models/Vehicle');
 
 module.exports = (app) => {
-  app.get('/cars', async (req, res) => {
+  app.get('/api/cars/list', async (req, res) => {
     await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'inventory', 'value']
     })

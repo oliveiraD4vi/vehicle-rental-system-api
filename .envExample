@@ -5,3 +5,10 @@ PG_NAME=
 PG_HOST=
 PG_PORT=
 PORT=3333
+
+PG_USER=bhlrsotyfyxima
+PG_PSSW=ffd68e84abaf85bfab995423e723426c5411c798ce3ca9d74a0c7811ed4c7fbb
+PG_NAME=d1873amiftqob4
+PG_HOST=ec2-34-200-205-45.compute-1.amazonaws.com
+PG_PORT=5432
+PORT=3333
