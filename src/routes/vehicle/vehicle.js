@@ -2,6 +2,9 @@ const Vehicle = require('../../models/Vehicle');
 
 module.exports = (app) => {
   app.get('/api/cars/list', async (req, res) => {
+    // #swagger.tags = ['Vehicle']
+    // #swagger.description = 'Vehicle listing endpoint'
+
     await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'inventory', 'value']
     })

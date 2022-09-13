@@ -8,6 +8,9 @@ const PersonalData = require('../../models/PersonalData');
 
 module.exports = (app) => {
   app.post('/api/user/register', async (req, res) => {
+    // #swagger.tags = ['User']
+    // #swagger.description = 'User registration endpoint'
+
     const data = req.body;
 
     if (!data.name || !data.email || !data.cpf || !data.password  || !data.bornAt) {
@@ -48,6 +51,9 @@ module.exports = (app) => {
   });
 
   app.post('/api/user/login', async (req, res) => {
+    // #swagger.tags = ['User']
+    // #swagger.description = 'User login endpoint'
+
     const user = await User.findOne({
       attributes: ['id', 'email', 'password', 'role'],
       where: {
