@@ -22,11 +22,8 @@ const Vehicle = db.define('vehicles', {
   },
   plate: {
     type: DataTypes.STRING,
-    allowNull: false
-  },
-  inventory: {
-    type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    unique: true
   },
   value: {
     type: DataTypes.BIGINT,

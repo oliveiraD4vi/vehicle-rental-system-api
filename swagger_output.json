@@ -110,13 +110,60 @@
         }
       }
     },
-    "/api/cars/list": {
+    "/api/vehicle/list": {
       "get": {
         "tags": [
           "Vehicle"
         ],
         "description": "Vehicle listing endpoint",
         "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/vehicle/register": {
+      "post": {
+        "tags": [
+          "Vehicle"
+        ],
+        "description": "Vehicle register endpoint",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "brand": {
+                  "example": "any"
+                },
+                "model": {
+                  "example": "any"
+                },
+                "color": {
+                  "example": "any"
+                },
+                "plate": {
+                  "example": "any"
+                },
+                "value": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
