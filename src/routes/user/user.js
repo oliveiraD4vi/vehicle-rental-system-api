@@ -5,8 +5,51 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../../models/User');
 const PersonalData = require('../../models/PersonalData');
+const { authUser } = require('../../middlewares/auth');
 
 module.exports = (app) => {
+  app.get('/api/user/list', authUser, async (req, res) => {
+    // #swagger.tags = ['User']
+    // #swagger.description = 'User listing endpoint'
+
+    await User.findAll({
+      attributes: ['id', 'email', 'password', 'role', 'personaldata_id']
+    })
+    .then((users) => {
+      if (users.length > 0) {
+        // doesn't work
+        try {
+          users.forEach(async (user) => {
+            const userData = await PersonalData.findOne({
+              attributes: ['id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'],
+              where: {
+                id: user.personaldata_id
+              }
+            });
+
+            user.personalData = userData;
+          });
+        } catch (error) {
+          return res.status(400).json({
+            error: true,
+            message: 'Erro: Erro desconhecido'
+          });
+        }
+        // -----------------
+
+        return res.json({
+          error: false,
+          users
+        });
+      } else {
+        return res.status(404).json({
+          error: true,
+          message: 'Erro: Sem usuários registrados'
+        });
+      }
+    })
+  });
+
   app.post('/api/user/register', async (req, res) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User registration endpoint'

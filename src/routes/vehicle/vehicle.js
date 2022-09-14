@@ -14,19 +14,19 @@ module.exports = (app) => {
       if (cars.length > 0) {
         return res.json({
           error: false,
-          cars: Object.values(cars),
+          cars: Object.values(cars)
         });
       } else {
-        return res.status(400).json({
+        return res.status(404).json({
           error: true,
-          message: "Erro: Sem carros registrados"
+          message: 'Erro: Sem carros registrados'
         });
       }
     })
     .catch(() => {
       return res.status(400).json({
         error: true,
-        message: "Erro: Erro desconhecido"
+        message: 'Erro: Erro desconhecido'
       });
     });
   });
