@@ -23,7 +23,8 @@ const PersonalData = db.define('personaldata', {
   },
   phone: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
+    unique: true
   },
   street: {
     type: DataTypes.STRING,
