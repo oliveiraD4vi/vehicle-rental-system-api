@@ -32,6 +32,29 @@
     "application/json"
   ],
   "paths": {
+    "/api/user/check": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Verify user token validate",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/api/user/list": {
       "get": {
         "tags": [

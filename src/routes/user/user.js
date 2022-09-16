@@ -8,6 +8,16 @@ const PersonalData = require('../../models/PersonalData');
 const { authUser } = require('../../middlewares/auth');
 
 module.exports = (app) => {
+  app.get('/api/user/check', authUser, async (req, res) => {
+    // #swagger.tags = ['User']
+    // #swagger.description = 'Verify user token validate'
+
+    return res.json({
+      error: false,
+      message: "Acesso permitido"
+    });
+  });
+
   app.get('/api/user/list', authUser, async (req, res) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User listing endpoint'
