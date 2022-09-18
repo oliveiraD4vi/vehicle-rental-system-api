@@ -30,7 +30,7 @@ module.exports = (app) => {
       if (cars.length > 0) {
         return res.json({
           error: false,
-          cars: Object.values(cars),
+          cars,
           totalCount
         });
       } else {
