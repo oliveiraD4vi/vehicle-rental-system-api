@@ -7,14 +7,31 @@ module.exports = (app) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle listing endpoint'
 
+    let { page, size, sort } = req.query;
+
+    if (!page) page = 1;
+    if (!size) size = 10;
+    if (!sort) sort = 'ASC';
+
+    const limit = parseInt(size);
+    const offset = (parseInt(page)-1) * size;
+
+    const totalCount = (await Vehicle.findAll()).length;
+
     await Vehicle.findAll({
-      attributes: ['id', 'brand', 'model', 'color', 'plate', 'value']
+      attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
+      limit,
+      offset,
+      order: [
+        ['id', sort],
+      ]
     })
     .then((cars) => {
       if (cars.length > 0) {
         return res.json({
           error: false,
-          cars: Object.values(cars)
+          cars: Object.values(cars),
+          totalCount
         });
       } else {
         return res.status(404).json({
