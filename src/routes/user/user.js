@@ -22,34 +22,33 @@ module.exports = (app) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User listing endpoint'
 
+    let { page, size, sort } = req.query;
+
+    if (!page) page = 1;
+    if (!size) size = 10;
+    if (!sort) sort = 'ASC';
+
+    const limit = parseInt(size);
+    const offset = (parseInt(page)-1) * size;
+
+    const totalCount = (await User.findAll()).length;
+
     await User.findAll({
-      attributes: ['id', 'email', 'password', 'role', 'personaldata_id']
+      attributes: ['id', 'email', 'password', 'role', 'personaldata_id'],
+      limit,
+      offset,
+      order: [
+        ['id', sort],
+      ]
     })
     .then((users) => {
+      // Falta as informações do PersonalData
+
       if (users.length > 0) {
-        // doesn't work
-        try {
-          users.forEach(async (user) => {
-            const userData = await PersonalData.findOne({
-              attributes: ['id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'],
-              where: {
-                id: user.personaldata_id
-              }
-            });
-
-            user.personalData = userData;
-          });
-        } catch (error) {
-          return res.status(400).json({
-            error: true,
-            message: 'Erro: Erro desconhecido'
-          });
-        }
-        // -----------------
-
         return res.json({
           error: false,
-          users
+          users,
+          totalCount
         });
       } else {
         return res.status(404).json({
