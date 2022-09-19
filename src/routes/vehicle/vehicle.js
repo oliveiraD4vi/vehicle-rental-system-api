@@ -1,8 +1,40 @@
 const Vehicle = require('../../models/Vehicle');
 
 const { authUser } = require('../../middlewares/auth');
+const { getRandomList } = require('../../services/vehicle');
 
 module.exports = (app) => {
+  app.get('/api/vehicle/list/random', async (req, res) => {
+    // #swagger.tags = ['Vehicle']
+    // #swagger.description = 'Vehicle listing 5 random items endpoint'
+
+    await Vehicle.findAll({
+      attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
+    })
+    .then(async (cars) => {
+      if (cars.length > 0) {
+        const randomList = await getRandomList(cars);
+
+        return res.json({
+          error: false,
+          message: "Lista retornada com sucesso",
+          randomList
+        });
+      } else {
+        return res.status(404).json({
+          error: true,
+          message: "Não há veículos cadastrados"
+        });
+      }
+    })
+    .catch(() => {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Erro desconhecido"
+      });
+    });
+  });
+
   app.get('/api/vehicle/list', async (req, res) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle listing endpoint'
