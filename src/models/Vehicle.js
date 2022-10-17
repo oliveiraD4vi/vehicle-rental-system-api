@@ -29,6 +29,14 @@ const Vehicle = db.define('vehicles', {
     type: DataTypes.BIGINT,
     allowNull: false
   },
+  rented: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  devolution: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
   createdAt: {
     type: DataTypes.DATE,
     allowNull: true

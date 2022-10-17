@@ -13,6 +13,4 @@ require('./src/models/database');
 require('./src/routes/index')(app);
 require('./swagger.js');
 
-app.listen(process.env.PORT, () => {
-  console.log("Servidor iniciado corretamente na porta " + process.env.PORT);
-});
+app.listen(process.env.PORT);
