@@ -18,6 +18,59 @@ module.exports = (app) => {
     });
   });
 
+  app.get('/api/user', authUser, async (req, res) => {
+    // #swagger.tags = ['User']
+    // #swagger.description = 'User get endpoint'
+
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Requisição incompleta'
+      });
+    }
+
+    const user = await User.findOne({
+      attributes: ['id', 'email', 'password', 'role', 'personaldata_id'],
+      where: {
+        id: id,
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Usuário não existe'
+      });
+    }
+
+    const personaldata = await PersonalData.findOne({
+      attributes: [
+        'id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'
+      ],
+      where: {
+        id: user.personaldata_id,
+      }
+    });
+
+    if (!personaldata) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Dados pessoais não existem'
+      });
+    }
+
+    const userData = { ...user.dataValues, ...personaldata.dataValues };
+
+    if (userData) {
+      return res.json({
+        error: false,
+        user: userData,
+      });
+    }
+  });
+
   app.get('/api/user/list', authUser, async (req, res) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User listing endpoint'

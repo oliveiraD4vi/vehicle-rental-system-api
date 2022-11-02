@@ -80,7 +80,7 @@ module.exports = (app) => {
     });
   });
 
-  app.delete('/api/vehicle/delete', authUser, async (req, res) => {
+  app.delete('/api/vehicle', authUser, async (req, res) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle delete endpoint'
 

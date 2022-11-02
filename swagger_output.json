@@ -55,6 +55,37 @@
         }
       }
     },
+    "/api/user": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "User get endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/user/list": {
       "get": {
         "tags": [
@@ -227,7 +258,7 @@
         }
       }
     },
-    "/api/vehicle/delete": {
+    "/api/vehicle": {
       "delete": {
         "tags": [
           "Vehicle"
