@@ -56,6 +56,35 @@
       }
     },
     "/api/user": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "description": "User delete endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
       "get": {
         "tags": [
           "User"

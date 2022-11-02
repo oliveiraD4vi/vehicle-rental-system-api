@@ -18,6 +18,72 @@ module.exports = (app) => {
     });
   });
 
+  app.delete('/api/user', authUser, async (req, res) => {
+    // #swagger.tags = ['User']
+    // #swagger.description = 'User delete endpoint'
+
+     const { id } = req.query;
+
+    if (!id) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Requisição incompleta'
+      });
+    }
+
+    const user = await User.findOne({
+      attributes: ['id', 'personaldata_id'],
+      where: {
+        id: id,
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Usuário não existe'
+      });
+    }
+
+    const personaldata = await PersonalData.findOne({
+      attributes: ['id'],
+      where: {
+        id: user.personaldata_id,
+      }
+    });
+
+    if (!personaldata) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Dados pessoais não existem'
+      });
+    }
+
+    await User.destroy({
+      where: {
+        id: id,
+      }
+    });
+
+    await PersonalData.destroy({
+      where: {
+        id: personaldata.id
+      }
+    })
+    .then(() => {
+      return res.json({
+        error: false,
+        message: 'Usuário deletado',
+      });
+    })
+    .catch(() => {
+      return res.status(400).json({
+        error: false,
+        message: 'Erro desconhecido',
+      });
+    });
+  });
+
   app.get('/api/user', authUser, async (req, res) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User get endpoint'
