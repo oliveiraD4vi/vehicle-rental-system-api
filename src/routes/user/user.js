@@ -33,30 +33,45 @@ module.exports = (app) => {
 
     const totalCount = (await User.findAll()).length;
 
-    await User.findAll({
+    const users = await User.findAll({
       attributes: ['id', 'email', 'password', 'role', 'personaldata_id'],
       limit,
       offset,
       order: [
         ['id', sort],
       ]
-    })
-    .then((users) => {
-      // Falta as informações do PersonalData
+    });
 
-      if (users.length > 0) {
-        return res.json({
-          error: false,
-          users,
-          totalCount
-        });
-      } else {
-        return res.status(404).json({
-          error: true,
-          message: 'Erro: Sem usuários registrados'
-        });
-      }
-    })
+    if (users.length === 0) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Sem usuários registrados'
+      });
+    }
+
+    const personaldata_users = await PersonalData.findAll({
+      attributes: [
+        'id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'
+      ],
+    });
+
+    const list = [];
+
+    users.forEach((user) => {
+      personaldata_users.forEach((data) => {
+        if (user.personaldata_id === data.id) {
+          list.push({ ...user.dataValues, ...data.dataValues });
+        }
+      });
+    });
+
+    if (list.length === users.length) {
+      return res.json({
+        error: false,
+        users: list,
+        totalCount
+      });
+    }
   });
 
   app.post('/api/user/register', async (req, res) => {
