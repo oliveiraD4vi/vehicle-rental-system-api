@@ -227,6 +227,37 @@
         }
       }
     },
+    "/api/vehicle/delete": {
+      "delete": {
+        "tags": [
+          "Vehicle"
+        ],
+        "description": "Vehicle delete endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/vehicle/register": {
       "post": {
         "tags": [

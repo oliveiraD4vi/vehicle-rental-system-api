@@ -80,6 +80,46 @@ module.exports = (app) => {
     });
   });
 
+  app.delete('/api/vehicle/delete', authUser, async (req, res) => {
+    // #swagger.tags = ['Vehicle']
+    // #swagger.description = 'Vehicle delete endpoint'
+
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Requisição incompleta'
+      });
+    }
+
+    const vehicle = await Vehicle.findOne({
+      attributes: ['id'],
+      where: {
+        id: id,
+      }
+    });
+
+    if (!vehicle) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Veículo não encontrado'
+      });
+    }
+
+    await Vehicle.destroy({
+      where: {
+        id: id,
+      }
+    })
+    .then(() => {
+      return res.json({
+        error: false,
+        message: 'Veículo deletado'
+      });
+    });
+  });
+
   app.post('/api/vehicle/register', authUser, async (req, res) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle register endpoint'
