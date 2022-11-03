@@ -4,6 +4,49 @@ const { authUser } = require('../../middlewares/auth');
 const { getRandomList } = require('../../services/vehicle');
 
 module.exports = (app) => {
+  app.put('/api/vehicle', async (req, res) => {
+    // #swagger.tags = ['Vehicle']
+    // #swagger.description = 'Vehicle editing endpoint'
+
+    const { id, brand, model, color, plate, value } = req.body;
+
+    if (!id || !brand || !model || !color || !plate || !value) {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Requisição incompleta"
+      });
+    }
+
+    const vehicle = await Vehicle.findByPk(id);
+
+    if (!vehicle) {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Veículo não encontrado"
+      });
+    }
+
+    vehicle.brand = await brand;
+    vehicle.model = await model;
+    vehicle.color = await color;
+    vehicle.plate = await plate;
+    vehicle.value = await value;
+
+    vehicle.save()
+    .then(() => {
+      return res.json({
+        error: false,
+        message: "Informações editadas com sucesso!"
+      });
+    })
+    .catch(() => {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Não foi possível salvar as informações. Verifique os dados únicos."
+      });
+    });
+  });
+
   app.get('/api/vehicle/list/random', async (req, res) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle listing 5 random items endpoint'
