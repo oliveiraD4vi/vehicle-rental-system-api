@@ -22,6 +22,58 @@ module.exports = (app) => {
   app.put('/api/user', authUser, async (req, res) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User editing endpoint'
+
+    const data = req.body;
+
+    const user = User.findByPk(data.id);
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Usuário não encontrado"
+      });
+    }
+
+    user.role = await data.role ? data.role : user.role;
+    user.email = await data.email ? data.email : user.email;
+    user.password = await data.password ? data.password : user.password;
+
+    const personalData = PersonalData.findByPk(user.personaldata_id);
+
+    if (!personalData) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Dados pessoais não encontrados"
+      });
+    }
+
+    personalData.name = await data.name ? data.name : personalData.name;
+    personalData.cpf = await data.cpf ? data.cpf : personalData.cpf;
+    personalData.bornAt = await data.bornAt ? data.bornAt : personalData.bornAt;
+    personalData.phone = await data.phone ? data.phone : personalData.phone;
+    personalData.street = await data.street ? data.street : personalData.street;
+    personalData.number = await data.number ? data.number : personalData.number;
+    personalData.neighborhood = await data.neighborhood ? personalData.neighborhood : user.neighborhood;
+    personalData.city = await data.city ? data.city : personalData.city;
+    personalData.state = await data.state ? data.state : personalData.state;
+    personalData.country = await data.country ? data.country : personalData.country;
+
+    console.log(user, personalData);
+
+    try {
+      personalData.save();
+      user.save();
+      
+      return res.json({
+        error: false,
+        message: 'Informações editadas com sucesso!'
+      });
+    } catch (error) {
+      return res.status(400).json({
+        error: true,
+        message: 'Erro: Não foi possível completar a operação'
+      });
+    }
   });
 
   app.delete('/api/user', authUser, async (req, res) => {
@@ -218,7 +270,7 @@ module.exports = (app) => {
       role: data.role,
       email: data.email,
       password: data.password,
-      personaldata_id: null
+      personaldata_id: null,
     }
 
     const personalData = {
