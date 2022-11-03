@@ -56,6 +56,24 @@
       }
     },
     "/api/user": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "description": "User editing endpoint",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "User"
@@ -185,6 +203,27 @@
                   "example": "any"
                 },
                 "role": {
+                  "example": "any"
+                },
+                "phone": {
+                  "example": "any"
+                },
+                "street": {
+                  "example": "any"
+                },
+                "number": {
+                  "example": "any"
+                },
+                "neighborhood": {
+                  "example": "any"
+                },
+                "city": {
+                  "example": "any"
+                },
+                "state": {
+                  "example": "any"
+                },
+                "country": {
                   "example": "any"
                 }
               }

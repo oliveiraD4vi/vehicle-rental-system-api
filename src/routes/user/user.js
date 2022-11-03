@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../../models/User');
 const PersonalData = require('../../models/PersonalData');
+
 const { authUser } = require('../../middlewares/auth');
 
 module.exports = (app) => {
@@ -16,6 +17,11 @@ module.exports = (app) => {
       error: false,
       message: "Acesso permitido"
     });
+  });
+
+  app.put('/api/user', authUser, async (req, res) => {
+    // #swagger.tags = ['User']
+    // #swagger.description = 'User editing endpoint'
   });
 
   app.delete('/api/user', authUser, async (req, res) => {
@@ -98,7 +104,7 @@ module.exports = (app) => {
     }
 
     const user = await User.findOne({
-      attributes: ['id', 'email', 'password', 'role', 'personaldata_id'],
+      attributes: ['id', 'email', 'role', 'personaldata_id'],
       where: {
         id: id,
       }
@@ -153,7 +159,7 @@ module.exports = (app) => {
     const totalCount = (await User.findAll()).length;
 
     const users = await User.findAll({
-      attributes: ['id', 'email', 'password', 'role', 'personaldata_id'],
+      attributes: ['id', 'email', 'role', 'personaldata_id'],
       limit,
       offset,
       order: [
@@ -215,15 +221,27 @@ module.exports = (app) => {
       personaldata_id: null
     }
 
+    const personalData = {
+      name: data.name,
+      cpf: data.cpf,
+      bornAt: data.bornAt,
+      phone: data.phone ? data.phone : null,
+      street: data.street ? data.street : null,
+      number: data.number ? data.number : null,
+      neighborhood: data.neighborhood ? data.neighborhood : null,
+      city: data.city ? data.city : null,
+      state: data.state ? data.state : null,
+      country: data.country ? data.country : null,
+    }
+
     try {
-      await PersonalData.create({
-        name: data.name,
-        cpf: data.cpf,
-        bornAt: data.bornAt
-      }).then((e) => {
+      await PersonalData.create(personalData)
+      .then((e) => {
         userData.personaldata_id = e.id;
-      })
+      });
+
       await User.create(userData);
+
       return res.json({
         error: false,
         message: 'Usuário cadastrado com sucesso!'
