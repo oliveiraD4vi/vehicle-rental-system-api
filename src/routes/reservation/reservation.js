@@ -1,4 +1,5 @@
 const { authUser } = require('../../middlewares/auth');
+const PersonalData = require('../../models/PersonalData');
 
 const Reservation = require('../../models/Reservation');
 const User = require('../../models/User');
@@ -100,15 +101,117 @@ module.exports = (app) => {
   app.delete('/api/reservation', authUser, async (req, res) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation delete endpoint'
+
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Requisição incompleta'
+      });
+    }
+
+    const reservation = await Reservation.findByPk(id);
+    
+    if (!reservation) {
+      return res.status(400).json({
+        error: true,
+        message: 'Erro: Reserva não encontrada'
+      });
+    }
+
+    await Reservation.destroy({
+      where: {
+        id: id,
+      }
+    })
+    .then(() => {
+      return res.json({
+        error: false,
+        message: 'Reserva deletada com sucesso!'
+      });
+    })
+    .catch(() => {
+      return res.status(400).json({
+        error: false,
+        message: 'Erro desconhecido',
+      });
+    });
   });
 
   app.get('/api/reservation', authUser, async (req, res) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation get endpoint'
+
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Requisição incompleta'
+      });
+    }
+
+    await Reservation.findByPk(id)
+    .then((reservation) => {
+      return res.json({
+        error: false,
+        reservation,
+        message: 'Reserva encontrada com sucesso!'
+      });
+    })
+    .catch(() => {
+      return res.status(400).json({
+        error: true,
+        message: 'Erro: Reserva não encontrada'
+      });
+    });
   });
 
   app.get('/api/reservation/list', authUser, async (req, res) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation listing endpoint'
+
+    let { page, size, sort } = req.query;
+
+    if (!page) page = 1;
+    if (!size) size = 10;
+    if (!sort) sort = 'ASC';
+
+    const limit = parseInt(size);
+    const offset = (parseInt(page)-1) * size;
+
+    const totalCount = (await Reservation.findAll()).length;
+
+    if (totalCount === 0) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Sem reservas registradas'
+      });
+    }
+
+    await Reservation.findAll({
+      attributes: [
+        'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status'
+      ],
+      limit,
+      offset,
+      order: [
+        ['id', sort],
+      ]
+    })
+    .then((reservations) => {
+      return res.json({
+        error: false,
+        reservations,
+        totalCount
+      });
+    })
+    .catch(() => {
+      return res.status(500).json({
+        error: true,
+        message: 'Erro: Erro desconhecido'
+      });
+    });
   });
 };

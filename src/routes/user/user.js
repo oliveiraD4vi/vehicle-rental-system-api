@@ -210,6 +210,13 @@ module.exports = (app) => {
 
     const totalCount = (await User.findAll()).length;
 
+    if (totalCount === 0) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Sem usuários registrados'
+      });
+    }
+
     const users = await User.findAll({
       attributes: ['id', 'email', 'role', 'personaldata_id'],
       limit,
@@ -218,13 +225,6 @@ module.exports = (app) => {
         ['id', sort],
       ]
     });
-
-    if (users.length === 0) {
-      return res.status(404).json({
-        error: true,
-        message: 'Erro: Sem usuários registrados'
-      });
-    }
 
     const personaldata_users = await PersonalData.findAll({
       attributes: [
@@ -236,9 +236,8 @@ module.exports = (app) => {
 
     users.forEach((user) => {
       personaldata_users.forEach((data) => {
-        if (user.personaldata_id === data.id) {
+        if (user.personaldata_id === data.id)
           list.push({ ...user.dataValues, ...data.dataValues });
-        }
       });
     });
 
