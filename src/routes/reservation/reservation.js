@@ -96,6 +96,41 @@ module.exports = (app) => {
   app.put('/api/reservation', authUser, async (req, res) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation editing endpoint'
+
+    const { id, step, status } = req.body;
+
+    if (!id || !step || !status) {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Requisição incompleta"
+      });
+    }
+
+    const reservation = await Reservation.findByPk(id);
+
+    if (!reservation) {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Reserva não encontrada"
+      });
+    }
+
+    reservation.step = await step;
+    reservation.status = await status;
+
+    reservation.save()
+    .then(() => {
+      return res.json({
+        error: false,
+        message: "Informações editadas com sucesso!"
+      });
+    })
+    .catch(() => {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Verifique os dados únicos"
+      });
+    });
   });
 
   app.delete('/api/reservation', authUser, async (req, res) => {

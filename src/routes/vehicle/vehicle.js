@@ -42,7 +42,7 @@ module.exports = (app) => {
     .catch(() => {
       return res.status(404).json({
         error: true,
-        message: "Erro: Não foi possível salvar as informações. Verifique os dados únicos."
+        message: "Erro: Verifique os dados únicos"
       });
     });
   });
