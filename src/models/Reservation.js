@@ -44,6 +44,10 @@ const Reservation = db.define('reservations', {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'CREATED'
+  },
+  total_value: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
   }
 });
 
