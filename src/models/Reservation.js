@@ -37,12 +37,13 @@ const Reservation = db.define('reservations', {
   },
   step: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    defaultValue: 'PERSONAL'
   },
   status: {
     type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: 'INITIALIZED'
+    defaultValue: 'CREATED'
   }
 });
 
