@@ -8,11 +8,11 @@ const sequelize = new Sequelize(
   process.env.PG_PSSW,
   {
     dialect: 'postgres',
-    // dialectOptions: {
-    //   ssl: {
-    //     rejectUnauthorized: false,
-    //   },
-    // },
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
     host: process.env.PG_HOST,
     port: process.env.PG_PORT
   }
