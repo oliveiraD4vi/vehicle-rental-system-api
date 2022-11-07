@@ -5,3 +5,4 @@ PG_NAME=vehicle
 PG_HOST=localhost
 PG_PORT=15432
 PORT=8080
+DEFAULT_URL=
