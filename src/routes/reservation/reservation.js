@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { authUser } = require('../../middlewares/auth');
 const PersonalData = require('../../models/PersonalData');
 
@@ -265,28 +266,36 @@ module.exports = (app) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation listing endpoint'
 
-    let { page, size, sort } = req.query;
+    let { page, size, sort, search } = req.query;
 
     if (!page) page = 1;
     if (!size) size = 10;
     if (!sort) sort = 'ASC';
+    if (!search) search = '';
 
     const limit = parseInt(size);
     const offset = (parseInt(page)-1) * size;
 
-    const totalCount = (await Reservation.findAll()).length;
-
-    if (totalCount === 0) {
-      return res.status(404).json({
-        error: true,
-        message: 'Erro: Sem reservas registradas'
-      });
-    }
+    const totalCount = (await Reservation.findAll({
+      attributes: ['step', 'status'],
+      where: {
+        [Op.or]: [
+          { step: { [Op.substring]: search } },
+          { status: { [Op.substring]: search } }
+        ]
+      }
+    })).length;
 
     await Reservation.findAll({
       attributes: [
         'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status'
       ],
+      where: {
+        [Op.or]: [
+          { step: { [Op.substring]: search } },
+          { status: { [Op.substring]: search } }
+        ]
+      },
       limit,
       offset,
       order: [

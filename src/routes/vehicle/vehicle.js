@@ -1,5 +1,6 @@
 const Vehicle = require('../../models/Vehicle');
 
+const { Op } = require("sequelize");
 const { authUser } = require('../../middlewares/auth');
 const { getRandomList } = require('../../services/vehicle');
 
@@ -82,19 +83,34 @@ module.exports = (app) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle listing endpoint'
 
-    let { page, size, sort } = req.query;
+    let { page, size, sort, search } = req.query;
 
     if (!page) page = 1;
     if (!size) size = 10;
     if (!sort) sort = 'ASC';
+    if (!search) search = '';
 
     const limit = parseInt(size);
     const offset = (parseInt(page)-1) * size;
 
-    const totalCount = (await Vehicle.findAll()).length;
+    const totalCount = (await Vehicle.findAll({
+      attributes: ['brand', 'model'],
+      where: {
+        [Op.or]: [
+          { model: { [Op.substring]: search } },
+          { brand: { [Op.substring]: search } }
+        ]
+      },
+    })).length;
 
     await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
+      where: {
+        [Op.or]: [
+          { model: { [Op.substring]: search } },
+          { brand: { [Op.substring]: search } }
+        ]
+      },
       limit,
       offset,
       order: [

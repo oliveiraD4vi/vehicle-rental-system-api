@@ -7,6 +7,7 @@ const User = require('../../models/User');
 const PersonalData = require('../../models/PersonalData');
 
 const { authUser } = require('../../middlewares/auth');
+const { Op } = require('sequelize');
 
 module.exports = (app) => {
   app.get('/api/user/check', authUser, async (req, res) => {
@@ -199,16 +200,17 @@ module.exports = (app) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User listing endpoint'
 
-    let { page, size, sort } = req.query;
+    let { page, size, sort, search } = req.query;
 
     if (!page) page = 1;
     if (!size) size = 10;
     if (!sort) sort = 'ASC';
+    if (!search) search = '';
 
     const limit = parseInt(size);
     const offset = (parseInt(page)-1) * size;
 
-    const totalCount = (await User.findAll()).length;
+    let totalCount = (await User.findAll()).length;
 
     if (totalCount === 0) {
       return res.status(404).json({
@@ -230,7 +232,15 @@ module.exports = (app) => {
       attributes: [
         'id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'
       ],
+      where: {
+        [Op.or]: [
+          { name: { [Op.substring]: search } },
+          { cpf: { [Op.substring]: search } }
+        ]
+      },
     });
+
+    totalCount = personaldata_users.length;
 
     const list = [];
 
@@ -241,7 +251,7 @@ module.exports = (app) => {
       });
     });
 
-    if (list.length === users.length) {
+    if (list.length === totalCount) {
       return res.json({
         error: false,
         users: list,
