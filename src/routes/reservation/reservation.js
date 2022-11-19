@@ -203,6 +203,64 @@ module.exports = (app) => {
     });
   });
 
+  app.get('/api/reservation/user', authUser, async (req, res) => {
+    // #swagger.tags = ['Reservation']
+    // #swagger.description = 'User reservations listing endpoint'
+
+    let { page, size, sort, id } = req.query;
+
+    if (!page) page = 1;
+    if (!size) size = 10;
+    if (!sort) sort = 'ASC';
+    if (!id) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Requisição incompleta'
+      });
+    }
+
+    const limit = parseInt(size);
+    const offset = (parseInt(page)-1) * size;
+
+    const totalCount = (await Reservation.findAll({
+      attributes: ['user_id'],
+      where: {
+        user_id: id,
+      }
+    })).length;
+
+    if (totalCount === 0) {
+      return res.status(404).json({
+        error: false,
+        reservations: [],
+        message: 'Sem reservas registradas'
+      });
+    }
+
+    await Reservation.findAll({
+      attributes: [
+        'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status'
+      ],
+      limit,
+      offset,
+      order: [['id', sort]],
+      where: { user_id: id }
+    })
+    .then((reservations) => {
+      return res.json({
+        error: false,
+        reservations,
+        totalCount
+      });
+    })
+    .catch(() => {
+      return res.status(500).json({
+        error: true,
+        message: 'Erro: Erro desconhecido'
+      });
+    });
+  });
+
   app.get('/api/reservation/list', authUser, async (req, res) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation listing endpoint'
