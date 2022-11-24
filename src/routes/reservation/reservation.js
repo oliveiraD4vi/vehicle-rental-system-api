@@ -303,11 +303,19 @@ module.exports = (app) => {
       ]
     })
     .then((reservations) => {
-      return res.json({
-        error: false,
-        reservations,
-        totalCount
-      });
+      if (reservations.length > 0) {
+        return res.json({
+          error: false,
+          reservations,
+          totalCount
+        });
+      } else {
+        return res.status(404).json({
+          error: true,
+          reservations,
+          message: 'Erro: Sem reservas registradas'
+        });
+      }
     })
     .catch(() => {
       return res.status(500).json({

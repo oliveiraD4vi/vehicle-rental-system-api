@@ -127,6 +127,7 @@ module.exports = (app) => {
       } else {
         return res.status(404).json({
           error: true,
+          cars,
           message: 'Erro: Sem carros registrados'
         });
       }

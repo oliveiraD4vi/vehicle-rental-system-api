@@ -252,11 +252,19 @@ module.exports = (app) => {
     });
 
     if (list.length === totalCount) {
-      return res.json({
-        error: false,
-        users: list,
-        totalCount
-      });
+      if (list.length > 0) {
+        return res.json({
+          error: false,
+          users: list,
+          totalCount
+        });
+      } else {
+        return res.status(404).json({
+          error: true,
+          users: list,
+          message: 'Erro: Sem usuários registrados'
+        });
+      }
     }
   });
 
