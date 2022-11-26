@@ -219,14 +219,7 @@ module.exports = (app) => {
       });
     }
 
-    const users = await User.findAll({
-      attributes: ['id', 'email', 'role', 'personaldata_id'],
-      limit,
-      offset,
-      order: [
-        ['id', sort],
-      ]
-    });
+    const users = await User.findAll();
 
     const personaldata_users = await PersonalData.findAll({
       attributes: [
@@ -238,6 +231,11 @@ module.exports = (app) => {
           { cpf: { [Op.substring]: search } }
         ]
       },
+      limit,
+      offset,
+      order: [
+        ['id', sort],
+      ]
     });
 
     totalCount = personaldata_users.length;
