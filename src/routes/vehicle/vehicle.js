@@ -56,9 +56,9 @@ module.exports = (app) => {
     await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
     })
-    .then(async (cars) => {
-      if (cars.length > 0) {
-        const randomList = await getRandomList(cars);
+    .then(async (vehicles) => {
+      if (vehicles.length > 0) {
+        const randomList = await getRandomList(vehicles);
 
         return res.json({
           error: false,
@@ -84,8 +84,6 @@ module.exports = (app) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle listing endpoint'
 
-    const data = req.body;
-
     let { page, size, sort, search } = req.query;
 
     if (!page) page = 1;
@@ -106,7 +104,7 @@ module.exports = (app) => {
       },
     })).length;
 
-    const vehicles = await Vehicle.findAll({
+    await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
       where: {
         [Op.or]: [
@@ -119,50 +117,28 @@ module.exports = (app) => {
       order: [
         ['id', sort],
       ]
-    });
-
-    let list = [];
-
-    if (data.pickup && data.devolution) {
-      vehicles.forEach(async (vehicle) => {
-        await Reservation.findOne({
-          attributes: ['vehicle_id', 'pickup', 'devolution'],
-          where: {
-            vehicle_id: vehicle.id,
-          }
-        })
-        .then((reservation) => {
-          if (reservation) {
-            if (
-              !(new Date(data.pickup).getTime() > new Date(reservation.pickup).getTime()
-                && new Date(data.pickup).getTime() < new Date(reservation.devolution).getTime()) &&
-              !(new Date(data.devolution).getTime() > new Date(reservation.pickup).getTime()
-                && new Date(data.devolution).getTime() < new Date(reservation.devolution).getTime()) &&
-              !(new Date(reservation.pickup).getTime() === new Date(data.pickup).getTime()
-                && new Date(reservation.devolution).getTime() === new Date(data.devolution).getTime())
-            ) {
-              list.push(vehicle);
-            }
-          }
+    })
+    .then((vehicles) => {
+      if (vehicles.length > 0) {
+        return res.json({
+          error: false,
+          vehicles,
+          totalCount
         });
-      });
-    } else {
-      list = vehicles;
-    }
-
-    if (list.length > 0) {
-      return res.json({
-        error: false,
-        vehicles: list,
-        totalCount
-      });
-    } else {
-      return res.status(404).json({
+      } else {
+        return res.status(404).json({
+          error: true,
+          vehicles,
+          message: 'Erro: Sem carros registrados'
+        });
+      }
+    })
+    .catch(() => {
+      return res.status(400).json({
         error: true,
-        vehicles: list,
-        message: 'Erro: Sem carros registrados'
+        message: 'Erro: Erro desconhecido'
       });
-    }
+    });
   });
 
   app.get('/api/vehicle', authUser, async (req, res) => {
