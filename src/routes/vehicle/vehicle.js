@@ -3,6 +3,7 @@ const Vehicle = require('../../models/Vehicle');
 const { Op } = require("sequelize");
 const { authUser } = require('../../middlewares/auth');
 const { getRandomList } = require('../../services/vehicle');
+const Reservation = require('../../models/Reservation');
 
 module.exports = (app) => {
   app.put('/api/vehicle', async (req, res) => {
@@ -83,6 +84,8 @@ module.exports = (app) => {
     // #swagger.tags = ['Vehicle']
     // #swagger.description = 'Vehicle listing endpoint'
 
+    const data = req.body;
+
     let { page, size, sort, search } = req.query;
 
     if (!page) page = 1;
@@ -103,7 +106,7 @@ module.exports = (app) => {
       },
     })).length;
 
-    await Vehicle.findAll({
+    const vehicles = await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
       where: {
         [Op.or]: [
@@ -116,28 +119,50 @@ module.exports = (app) => {
       order: [
         ['id', sort],
       ]
-    })
-    .then((cars) => {
-      if (cars.length > 0) {
-        return res.json({
-          error: false,
-          cars,
-          totalCount
-        });
-      } else {
-        return res.status(404).json({
-          error: true,
-          cars,
-          message: 'Erro: Sem carros registrados'
-        });
-      }
-    })
-    .catch(() => {
-      return res.status(400).json({
-        error: true,
-        message: 'Erro: Erro desconhecido'
-      });
     });
+
+    let list = [];
+
+    if (data.pickup && data.devolution) {
+      vehicles.forEach(async (vehicle) => {
+        await Reservation.findOne({
+          attributes: ['vehicle_id', 'pickup', 'devolution'],
+          where: {
+            vehicle_id: vehicle.id,
+          }
+        })
+        .then((reservation) => {
+          if (reservation) {
+            if (
+              !(new Date(data.pickup).getTime() > new Date(reservation.pickup).getTime()
+                && new Date(data.pickup).getTime() < new Date(reservation.devolution).getTime()) &&
+              !(new Date(data.devolution).getTime() > new Date(reservation.pickup).getTime()
+                && new Date(data.devolution).getTime() < new Date(reservation.devolution).getTime()) &&
+              !(new Date(reservation.pickup).getTime() === new Date(data.pickup).getTime()
+                && new Date(reservation.devolution).getTime() === new Date(data.devolution).getTime())
+            ) {
+              list.push(vehicle);
+            }
+          }
+        });
+      });
+    } else {
+      list = vehicles;
+    }
+
+    if (list.length > 0) {
+      return res.json({
+        error: false,
+        vehicles: list,
+        totalCount
+      });
+    } else {
+      return res.status(404).json({
+        error: true,
+        vehicles: list,
+        message: 'Erro: Sem carros registrados'
+      });
+    }
   });
 
   app.get('/api/vehicle', authUser, async (req, res) => {
