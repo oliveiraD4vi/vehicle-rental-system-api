@@ -3,6 +3,7 @@ const Vehicle = require('../../models/Vehicle');
 const { Op } = require("sequelize");
 const { authUser } = require('../../middlewares/auth');
 const { getRandomList } = require('../../services/vehicle');
+const Reservation = require('../../models/Reservation');
 
 module.exports = (app) => {
   app.put('/api/vehicle', async (req, res) => {
@@ -55,9 +56,9 @@ module.exports = (app) => {
     await Vehicle.findAll({
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
     })
-    .then(async (cars) => {
-      if (cars.length > 0) {
-        const randomList = await getRandomList(cars);
+    .then(async (vehicles) => {
+      if (vehicles.length > 0) {
+        const randomList = await getRandomList(vehicles);
 
         return res.json({
           error: false,
@@ -117,17 +118,17 @@ module.exports = (app) => {
         ['id', sort],
       ]
     })
-    .then((cars) => {
-      if (cars.length > 0) {
+    .then((vehicles) => {
+      if (vehicles.length > 0) {
         return res.json({
           error: false,
-          cars,
+          vehicles,
           totalCount
         });
       } else {
         return res.status(404).json({
           error: true,
-          cars,
+          vehicles,
           message: 'Erro: Sem carros registrados'
         });
       }

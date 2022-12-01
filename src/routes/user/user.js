@@ -221,6 +221,18 @@ module.exports = (app) => {
 
     const users = await User.findAll();
 
+    totalCount = (
+      await PersonalData.findAll({
+        attributes: ['name', 'cpf'],
+        where: {
+          [Op.or]: [
+            { name: { [Op.substring]: search } },
+            { cpf: { [Op.substring]: search } }
+          ]
+        },
+      })
+    ).length;
+
     const personaldata_users = await PersonalData.findAll({
       attributes: [
         'id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'
@@ -238,8 +250,6 @@ module.exports = (app) => {
       ]
     });
 
-    totalCount = personaldata_users.length;
-
     const list = [];
 
     users.forEach((user) => {
@@ -249,7 +259,7 @@ module.exports = (app) => {
       });
     });
 
-    if (list.length === totalCount) {
+    if (list.length === personaldata_users.length) {
       if (list.length > 0) {
         return res.json({
           error: false,
