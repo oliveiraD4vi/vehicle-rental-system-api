@@ -5,6 +5,7 @@ require('dotenv/config');
 const outputFile = './swagger_output.json';
 const endpointsFiles = [
   './src/routes/user/user.js',
+  './src/routes/user/auth/userAuth.js',
   './src/routes/vehicle/vehicle.js',
   './src/routes/reservation/reservation.js'
 ];
