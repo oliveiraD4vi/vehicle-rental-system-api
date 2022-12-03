@@ -31,29 +31,6 @@
     "application/json"
   ],
   "paths": {
-    "/api/user/check": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "description": "Verify user token validate",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
     "/api/user": {
       "put": {
         "tags": [
@@ -79,9 +56,6 @@
                   "example": "any"
                 },
                 "email": {
-                  "example": "any"
-                },
-                "password": {
                   "example": "any"
                 },
                 "name": {
@@ -186,6 +160,37 @@
         }
       }
     },
+    "/api/user/personal": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "User personal data get endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/user/list": {
       "get": {
         "tags": [
@@ -228,6 +233,29 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/user/check": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Verify user token validate",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           }
         }
       }
