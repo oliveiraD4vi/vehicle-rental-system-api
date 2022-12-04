@@ -1,6 +1,5 @@
 const { Op } = require('sequelize');
 const { authUser } = require('../../middlewares/auth');
-const PersonalData = require('../../models/PersonalData');
 
 const Reservation = require('../../models/Reservation');
 const User = require('../../models/User');
@@ -22,15 +21,15 @@ module.exports = (app) => {
 
     const user = await User.findByPk(data.user_id);
     
-    if (!user) {
-      return res.status(400).json({
+    if (!user || user.role === "ADMIN") {
+      return res.status(404).json({
         error: true,
         message: "Erro: Usuário não encontrado"
       });
     }
 
     const reserv = await Reservation.findOne({
-      attributes: ['user_id', 'step'],
+      attributes: ['user_id', 'status'],
       where: {
         user_id: user.id,
         status: 'CREATED'
@@ -212,7 +211,7 @@ module.exports = (app) => {
 
     if (!page) page = 1;
     if (!size) size = 10;
-    if (!sort) sort = 'ASC';
+    if (!sort) sort = 'DESC';
     if (!id) {
       return res.status(404).json({
         error: true,
