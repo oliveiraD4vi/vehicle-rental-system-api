@@ -1,6 +1,5 @@
 const { Op } = require('sequelize');
 const { authUser } = require('../../middlewares/auth');
-const PersonalData = require('../../models/PersonalData');
 
 const Reservation = require('../../models/Reservation');
 const User = require('../../models/User');
@@ -22,15 +21,15 @@ module.exports = (app) => {
 
     const user = await User.findByPk(data.user_id);
     
-    if (!user) {
-      return res.status(400).json({
+    if (!user || user.role === "ADMIN") {
+      return res.status(404).json({
         error: true,
         message: "Erro: Usuário não encontrado"
       });
     }
 
     const reserv = await Reservation.findOne({
-      attributes: ['user_id', 'step'],
+      attributes: ['user_id', 'status'],
       where: {
         user_id: user.id,
         status: 'CREATED'
@@ -53,27 +52,29 @@ module.exports = (app) => {
       });
     }
 
-    const reserva = await Reservation.findOne({
+    const reservationList = await Reservation.findAll({
       attributes: ['vehicle_id', 'pickup', 'devolution'],
       where: {
         vehicle_id: vehicle.id,
       }
     });
 
-    if (reserva) {
-      if (
-        (new Date(data.pickup).getTime() > new Date(reserva.pickup).getTime()
-          && new Date(data.pickup).getTime() < new Date(reserva.devolution).getTime()) ||
-        (new Date(data.devolution).getTime() > new Date(reserva.pickup).getTime()
-          && new Date(data.devolution).getTime() < new Date(reserva.devolution).getTime()) ||
-        (new Date(reserva.pickup).getTime() === new Date(data.pickup).getTime()
-          && new Date(reserva.devolution).getTime() === new Date(data.devolution).getTime())
-      ) {
-        return res.status(400).json({
-          error: true,
-          message: "Erro: Veículo não se encontra disponível nestas datas"
-        });
-      }
+    if (reservationList) {
+      reservationList.forEach((reserva) => {
+        if (
+          (new Date(data.pickup).getTime() > new Date(reserva.pickup).getTime()
+            && new Date(data.pickup).getTime() < new Date(reserva.devolution).getTime()) ||
+          (new Date(data.devolution).getTime() > new Date(reserva.pickup).getTime()
+            && new Date(data.devolution).getTime() < new Date(reserva.devolution).getTime()) ||
+          (new Date(reserva.pickup).getTime() === new Date(data.pickup).getTime()
+            && new Date(reserva.devolution).getTime() === new Date(data.devolution).getTime())
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "Erro: Veículo não se encontra disponível nestas datas"
+          });
+        }
+      });
     }
 
     if (!data.status) data.status = "CREATED";
@@ -212,7 +213,7 @@ module.exports = (app) => {
 
     if (!page) page = 1;
     if (!size) size = 10;
-    if (!sort) sort = 'ASC';
+    if (!sort) sort = 'DESC';
     if (!id) {
       return res.status(404).json({
         error: true,

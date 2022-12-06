@@ -52,12 +52,6 @@
                 "id": {
                   "example": "any"
                 },
-                "role": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
                 "name": {
                   "example": "any"
                 },
@@ -86,6 +80,12 @@
                   "example": "any"
                 },
                 "country": {
+                  "example": "any"
+                },
+                "role": {
+                  "example": "any"
+                },
+                "email": {
                   "example": "any"
                 }
               }
@@ -613,6 +613,9 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       },
@@ -811,6 +814,187 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/reservation/last": {
+      "get": {
+        "tags": [
+          "Reservation"
+        ],
+        "description": "Get last ongoing reservation endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/reservation/confirm": {
+      "put": {
+        "tags": [
+          "Reservation"
+        ],
+        "description": "Reservation vehicle confirm endpoint",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pickup": {
+                  "example": "any"
+                },
+                "devolution": {
+                  "example": "any"
+                },
+                "reservationId": {
+                  "example": "any"
+                },
+                "vehicleId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/reservation/previous": {
+      "put": {
+        "tags": [
+          "Reservation"
+        ],
+        "description": "Reservation previous step endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/reservation/next": {
+      "put": {
+        "tags": [
+          "Reservation"
+        ],
+        "description": "Reservation next step endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/reservation/form": {
+      "post": {
+        "tags": [
+          "Reservation"
+        ],
+        "description": "Reservation Form creation endpoint",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "example": "any"
+                },
+                "vehicle_id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }

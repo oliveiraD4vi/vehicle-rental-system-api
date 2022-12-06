@@ -7,7 +7,8 @@ const endpointsFiles = [
   './src/routes/user/user.js',
   './src/routes/user/auth/userAuth.js',
   './src/routes/vehicle/vehicle.js',
-  './src/routes/reservation/reservation.js'
+  './src/routes/reservation/reservation.js',
+  './src/routes/reservation/formRoutes/formRoutes.js'
 ];
 
 const doc = {
