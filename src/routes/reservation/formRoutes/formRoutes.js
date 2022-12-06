@@ -1,4 +1,6 @@
 const Reservation = require('../../../models/Reservation');
+const Vehicle = require('../../../models/Vehicle');
+const User = require('../../../models/User');
 
 const { authUser } = require('../../../middlewares/auth');
 
@@ -46,9 +48,94 @@ module.exports = (app) => {
       });
     }
 
-    return res.json({
-      error: false,
-      message: "Reserva atualizada com sucesso!"
+    switch (reservation.step) {
+      case "PERSONAL":
+        reservation.step = "VEHICLE";
+        break;
+      case "VEHICLE":
+        reservation.step = "PAYMENT";
+        break;
+      case "PAYMENT":
+        reservation.step = "CONCLUDED";
+        break;
+      default:
+        break;
+    }
+
+    if (reservation.step === "CONCLUDED") {
+      switch (reservation.status) {
+        case "CREATED":
+          reservation.status = "CONFIRMED";
+          break;
+        case "CONFIRMED":
+          reservation.status = "PICKUP";
+          break;
+        case "PICKUP":
+          reservation.status = "FINALIZED";
+          break;
+        default:
+          break;
+      }
+    }
+
+    reservation.save()
+    .then(() => {
+      return res.json({
+        error: false,
+        message: "Reserva atualizada com sucesso!"
+      });
+    })
+    .catch(() => {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Verifique os dados passados"
+      });
     });
+  });
+
+  app.post('/api/reservation/form', authUser, async (req, res) => {
+    // #swagger.tags = ['Reservation']
+    // #swagger.description = 'Reservation Form creation endpoint'
+
+    const data = req.body;
+
+    if (!data.user_id || !data.vehicle_id) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Requisição incompleta"
+      });
+    }
+
+    const user = await User.findByPk(data.user_id);
+
+    if (!user || user.role === "ADMIN") {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Usuário não encontrado"
+      });
+    }
+
+    const vehicle = await Vehicle.findByPk(data.vehicle_id);
+
+    if (!vehicle) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Veículo não encontrado"
+      });
+    }
+
+    try {
+      await Reservation.create(data);
+
+      return res.json({
+        error: false,
+        message: 'Reserva criada com status PERSONAL'
+      });
+    } catch (error) {
+      return res.status(400).json({
+        error: true,
+        message: 'Erro: Verifique os campos de entrada'
+      });
+    }
   });
 };

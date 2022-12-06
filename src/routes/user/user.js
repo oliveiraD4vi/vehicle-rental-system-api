@@ -13,19 +13,7 @@ module.exports = (app) => {
 
     const data = req.body;
 
-    const user = await User.findByPk(data.id);
-
-    if (!user) {
-      return res.status(400).json({
-        error: true,
-        message: "Erro: Usuário não encontrado"
-      });
-    }
-
-    user.role = await data.role ? data.role : user.role;
-    user.email = await data.email ? data.email : user.email;
-
-    const personalData = await PersonalData.findByPk(user.personaldata_id);
+    const personalData = await PersonalData.findByPk(data.id);
 
     if (!personalData) {
       return res.status(400).json({
@@ -44,6 +32,22 @@ module.exports = (app) => {
     personalData.city = await data.city ? data.city : personalData.city;
     personalData.state = await data.state ? data.state : personalData.state;
     personalData.country = await data.country ? data.country : personalData.country;
+
+    const user = await User.findOne({
+      where: {
+        personaldata_id: data.id
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Usuário não encontrado"
+      });
+    }
+
+    user.role = await data.role ? data.role : user.role;
+    user.email = await data.email ? data.email : user.email;
 
     try {
       personalData.save();

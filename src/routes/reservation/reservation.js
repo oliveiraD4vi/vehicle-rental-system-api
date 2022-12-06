@@ -79,6 +79,7 @@ module.exports = (app) => {
     if (!data.step) data.step = "PERSONAL";
 
     try {
+      console.log(data);
       await Reservation.create(data);
 
       return res.json({
