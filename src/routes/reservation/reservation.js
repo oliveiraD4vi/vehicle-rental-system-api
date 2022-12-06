@@ -241,7 +241,7 @@ module.exports = (app) => {
 
     await Reservation.findAll({
       attributes: [
-        'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status'
+        'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status', 'total_value'
       ],
       limit,
       offset,
@@ -289,7 +289,7 @@ module.exports = (app) => {
 
     await Reservation.findAll({
       attributes: [
-        'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status'
+        'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status', 'total_value'
       ],
       where: {
         [Op.or]: [

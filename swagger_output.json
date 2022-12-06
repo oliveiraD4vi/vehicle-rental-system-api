@@ -878,6 +878,9 @@
                 },
                 "vehicleId": {
                   "example": "any"
+                },
+                "value": {
+                  "example": "any"
                 }
               }
             }
