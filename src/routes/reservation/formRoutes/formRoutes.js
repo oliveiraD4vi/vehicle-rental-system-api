@@ -33,6 +33,78 @@ module.exports = (app) => {
     });
   });
 
+  app.put('/api/reservation/confirm', authUser, async (req, res) => {
+    // #swagger.tags = ['Reservation']
+    // #swagger.description = 'Reservation vehicle confirm endpoint'
+
+    const { pickup, devolution, reservationId, vehicleId } = req.body;
+
+    if (!pickup || !devolution || !reservationId || !vehicleId) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Requisição incompleta"
+      });
+    }
+
+    const reservation = await Reservation.findByPk(reservationId);
+
+    if (!reservation) {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Reserva não encontrada"
+      });
+    }
+
+    const reservationList = await Reservation.findAll({
+      attributes: ['vehicle_id', 'pickup', 'devolution'],
+      where: {
+        vehicle_id: vehicleId,
+      }
+    });
+
+    if (reservationList) {
+      reservationList.forEach((reserva) => {
+        if (
+          (new Date(pickup).getTime() > new Date(reserva.pickup).getTime()
+            && new Date(pickup).getTime() < new Date(reserva.devolution).getTime()) ||
+          (new Date(devolution).getTime() > new Date(reserva.pickup).getTime()
+            && new Date(devolution).getTime() < new Date(reserva.devolution).getTime()) ||
+          (new Date(reserva.pickup).getTime() === new Date(pickup).getTime()
+            && new Date(reserva.devolution).getTime() === new Date(devolution).getTime())
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "Erro: Veículo não se encontra disponível nestas datas"
+          });
+        }
+      });
+    }
+
+    reservation.pickup = pickup;
+    reservation.devolution = devolution;
+
+    if (reservation.pickup && reservation.devolution) {
+      try {
+        await reservation.save();
+
+        return res.json({
+          error: false,
+          message: "Reserva atualizada com sucesso"
+        });
+      } catch (error) {
+        return res.status(400).json({
+          error: false,
+          message: "Não foi possível fazer a confirmação"
+        });
+      }
+    }
+
+    return res.status(400).json({
+      error: false,
+      message: "Não foi possível fazer a confirmação"
+    });
+  });
+
   app.put('/api/reservation/next', authUser, async (req, res) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation next step endpoint'

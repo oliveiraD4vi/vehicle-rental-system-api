@@ -52,34 +52,35 @@ module.exports = (app) => {
       });
     }
 
-    const reserva = await Reservation.findOne({
+    const reservationList = await Reservation.findAll({
       attributes: ['vehicle_id', 'pickup', 'devolution'],
       where: {
         vehicle_id: vehicle.id,
       }
     });
 
-    if (reserva) {
-      if (
-        (new Date(data.pickup).getTime() > new Date(reserva.pickup).getTime()
-          && new Date(data.pickup).getTime() < new Date(reserva.devolution).getTime()) ||
-        (new Date(data.devolution).getTime() > new Date(reserva.pickup).getTime()
-          && new Date(data.devolution).getTime() < new Date(reserva.devolution).getTime()) ||
-        (new Date(reserva.pickup).getTime() === new Date(data.pickup).getTime()
-          && new Date(reserva.devolution).getTime() === new Date(data.devolution).getTime())
-      ) {
-        return res.status(400).json({
-          error: true,
-          message: "Erro: Veículo não se encontra disponível nestas datas"
-        });
-      }
+    if (reservationList) {
+      reservationList.forEach((reserva) => {
+        if (
+          (new Date(data.pickup).getTime() > new Date(reserva.pickup).getTime()
+            && new Date(data.pickup).getTime() < new Date(reserva.devolution).getTime()) ||
+          (new Date(data.devolution).getTime() > new Date(reserva.pickup).getTime()
+            && new Date(data.devolution).getTime() < new Date(reserva.devolution).getTime()) ||
+          (new Date(reserva.pickup).getTime() === new Date(data.pickup).getTime()
+            && new Date(reserva.devolution).getTime() === new Date(data.devolution).getTime())
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "Erro: Veículo não se encontra disponível nestas datas"
+          });
+        }
+      });
     }
 
     if (!data.status) data.status = "CREATED";
     if (!data.step) data.step = "PERSONAL";
 
     try {
-      console.log(data);
       await Reservation.create(data);
 
       return res.json({

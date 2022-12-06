@@ -849,6 +849,53 @@
         }
       }
     },
+    "/api/reservation/confirm": {
+      "put": {
+        "tags": [
+          "Reservation"
+        ],
+        "description": "Reservation vehicle confirm endpoint",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pickup": {
+                  "example": "any"
+                },
+                "devolution": {
+                  "example": "any"
+                },
+                "reservationId": {
+                  "example": "any"
+                },
+                "vehicleId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/reservation/next": {
       "put": {
         "tags": [
