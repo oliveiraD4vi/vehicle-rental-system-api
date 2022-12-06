@@ -105,6 +105,52 @@ module.exports = (app) => {
     });
   });
 
+  app.put('/api/reservation/previous', authUser, async (req, res) => {
+    // #swagger.tags = ['Reservation']
+    // #swagger.description = 'Reservation previous step endpoint'
+
+    const { id } = req.query;
+
+    const reservation = await Reservation.findByPk(id);
+
+    if (!reservation) {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Reserva não encontrada"
+      });
+    }
+
+    if (reservation.status === "CREATED") {
+      switch (reservation.step) {
+        case "CONCLUDED":
+          reservation.step = "PAYMENT";
+        break;
+        case "PAYMENT":
+          reservation.step = "VEHICLE";
+        break;
+        case "VEHICLE":
+          reservation.step = "PERSONAL";
+        break;
+      default:
+        break;
+      }
+    }
+
+    reservation.save()
+    .then(() => {
+      return res.json({
+        error: false,
+        message: "Reserva atualizada com sucesso!"
+      });
+    })
+    .catch(() => {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Verifique os dados passados"
+      });
+    });
+  });
+
   app.put('/api/reservation/next', authUser, async (req, res) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation next step endpoint'

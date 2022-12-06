@@ -896,6 +896,37 @@
         }
       }
     },
+    "/api/reservation/previous": {
+      "put": {
+        "tags": [
+          "Reservation"
+        ],
+        "description": "Reservation previous step endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/reservation/next": {
       "put": {
         "tags": [

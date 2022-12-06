@@ -28,7 +28,7 @@ module.exports = (app) => {
     personalData.phone = await data.phone ? data.phone : personalData.phone;
     personalData.street = await data.street ? data.street : personalData.street;
     personalData.number = await data.number ? data.number : personalData.number;
-    personalData.neighborhood = await data.neighborhood ? personalData.neighborhood : user.neighborhood;
+    personalData.neighborhood = await data.neighborhood ? data.neighborhood : personalData.neighborhood;
     personalData.city = await data.city ? data.city : personalData.city;
     personalData.state = await data.state ? data.state : personalData.state;
     personalData.country = await data.country ? data.country : personalData.country;
