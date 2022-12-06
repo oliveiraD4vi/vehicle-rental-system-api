@@ -3,6 +3,7 @@ const Vehicle = require('../../../models/Vehicle');
 const User = require('../../../models/User');
 
 const { authUser } = require('../../../middlewares/auth');
+const { getTotalValue } = require('../../../services/reservation');
 
 module.exports = (app) => {
   app.get('/api/reservation/last', authUser, async (req, res) => {
@@ -37,7 +38,7 @@ module.exports = (app) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation vehicle confirm endpoint'
 
-    const { pickup, devolution, reservationId, vehicleId } = req.body;
+    const { pickup, devolution, reservationId, vehicleId, value } = req.body;
 
     if (!pickup || !devolution || !reservationId || !vehicleId) {
       return res.status(400).json({
@@ -52,6 +53,15 @@ module.exports = (app) => {
       return res.status(404).json({
         error: true,
         message: "Erro: Reserva não encontrada"
+      });
+    }
+
+    const vehicle = await Vehicle.findByPk(vehicleId);
+
+    if (!vehicle) {
+      return res.status(404).json({
+        error: true,
+        message: "Erro: Veículo não encontrado"
       });
     }
 
@@ -82,6 +92,7 @@ module.exports = (app) => {
 
     reservation.pickup = pickup;
     reservation.devolution = devolution;
+    reservation.total_value = await getTotalValue(pickup, devolution, vehicle.value);
 
     if (reservation.pickup && reservation.devolution) {
       try {
@@ -243,7 +254,7 @@ module.exports = (app) => {
     }
 
     try {
-      await Reservation.create(data);
+      await Reservation.create({ ...data, pickup: null, devolution: null });
 
       return res.json({
         error: false,
