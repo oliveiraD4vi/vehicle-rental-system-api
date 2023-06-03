@@ -293,8 +293,10 @@ module.exports = (app) => {
       ],
       where: {
         [Op.or]: [
-          { step: { [Op.substring]: search } },
-          { status: { [Op.substring]: search } }
+          { step: { [Op.iLike]: `%${search}%` } },
+          { status: { [Op.iLike]: `%${search}%` } },
+          { pickup: { [Op.iLike]: `%${search}%` } },
+          { devolution: { [Op.iLike]: `%${search}%` } },
         ]
       },
       limit,

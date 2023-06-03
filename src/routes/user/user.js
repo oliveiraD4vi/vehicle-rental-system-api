@@ -69,7 +69,7 @@ module.exports = (app) => {
     // #swagger.tags = ['User']
     // #swagger.description = 'User delete endpoint'
 
-     const { id } = req.query;
+    const { id } = req.query;
 
     if (!id) {
       return res.status(404).json({
@@ -81,7 +81,7 @@ module.exports = (app) => {
     const user = await User.findOne({
       attributes: ['id', 'personaldata_id'],
       where: {
-        id: id,
+        personaldata_id: id,
       }
     });
 
@@ -262,8 +262,8 @@ module.exports = (app) => {
         attributes: ['name', 'cpf'],
         where: {
           [Op.or]: [
-            { name: { [Op.substring]: search } },
-            { cpf: { [Op.substring]: search } }
+            { name: { [Op.iLike]: `%${search}%` } },
+            { cpf: { [Op.iLike]: `%${search}%` } }
           ]
         },
       })
@@ -275,8 +275,13 @@ module.exports = (app) => {
       ],
       where: {
         [Op.or]: [
-          { name: { [Op.substring]: search } },
-          { cpf: { [Op.substring]: search } }
+          { name: { [Op.iLike]: `%${search}%` } },
+          { cpf: { [Op.iLike]: `%${search}%` } },
+          { phone: { [Op.iLike]: `%${search}%` } },
+          { city: { [Op.iLike]: `%${search}%` } },
+          { state: { [Op.iLike]: `%${search}%` } },
+          { country: { [Op.iLike]: `%${search}%` } },
+          { neighborhood: { [Op.iLike]: `%${search}%` } }
         ]
       },
       limit,
@@ -291,7 +296,7 @@ module.exports = (app) => {
     users.forEach((user) => {
       personaldata_users.forEach((data) => {
         if (user.personaldata_id === data.id)
-          list.push({ ...user.dataValues, ...data.dataValues });
+          list.push({ ...data.dataValues, ...user.dataValues });
       });
     });
 

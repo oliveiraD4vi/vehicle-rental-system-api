@@ -108,8 +108,10 @@ module.exports = (app) => {
       attributes: ['id', 'brand', 'model', 'color', 'plate', 'value'],
       where: {
         [Op.or]: [
-          { model: { [Op.substring]: search } },
-          { brand: { [Op.substring]: search } }
+          { model: { [Op.iLike]: `%${search}%` } },
+          { brand: { [Op.iLike]: `%${search}%` } },
+          { color: { [Op.iLike]: `%${search}%` } },
+          { plate: { [Op.iLike]: `%${search}%` } },
         ]
       },
       limit,
