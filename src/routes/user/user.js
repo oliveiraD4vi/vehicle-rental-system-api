@@ -13,7 +13,23 @@ module.exports = (app) => {
 
     const data = req.body;
 
-    const personalData = await PersonalData.findByPk(data.id);
+    const user = await User.findByPk(data.id);
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Usuário não encontrado"
+      });
+    }
+
+    user.role = await data.role ? data.role : user.role;
+    user.email = await data.email ? data.email : user.email;
+
+    const personalData = await PersonalData.findOne({
+      where: {
+        id: data.personaldata_id
+      }
+    });
 
     if (!personalData) {
       return res.status(400).json({
@@ -32,22 +48,6 @@ module.exports = (app) => {
     personalData.city = await data.city ? data.city : personalData.city;
     personalData.state = await data.state ? data.state : personalData.state;
     personalData.country = await data.country ? data.country : personalData.country;
-
-    const user = await User.findOne({
-      where: {
-        personaldata_id: data.id
-      }
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        error: true,
-        message: "Erro: Usuário não encontrado"
-      });
-    }
-
-    user.role = await data.role ? data.role : user.role;
-    user.email = await data.email ? data.email : user.email;
 
     try {
       personalData.save();
@@ -169,7 +169,7 @@ module.exports = (app) => {
       });
     }
 
-    const userData = { ...user.dataValues, ...personaldata.dataValues };
+    const userData = { ...personaldata.dataValues, ...user.dataValues };
 
     if (userData) {
       return res.json({
@@ -192,26 +192,10 @@ module.exports = (app) => {
       });
     }
 
-    const personaldata = await PersonalData.findOne({
-      attributes: [
-        'id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'
-      ],
-      where: {
-        id: id,
-      }
-    });
-
-    if (!personaldata) {
-      return res.status(404).json({
-        error: true,
-        message: 'Erro: Dados pessoais não existem'
-      });
-    }
-
     const user = await User.findOne({
       attributes: ['id', 'email', 'role', 'personaldata_id'],
       where: {
-        personaldata_id: personaldata.id,
+        id: id,
       }
     });
 
@@ -222,7 +206,23 @@ module.exports = (app) => {
       });
     }
 
-    const userData = { ...user.dataValues, ...personaldata.dataValues };
+    const personaldata = await PersonalData.findOne({
+      attributes: [
+        'id', 'name', 'cpf', 'bornAt', 'phone', 'street', 'number', 'neighborhood', 'city', 'state', 'country'
+      ],
+      where: {
+        id: user.personaldata_id,
+      }
+    });
+
+    if (!personaldata) {
+      return res.status(404).json({
+        error: true,
+        message: 'Erro: Dados pessoais não existem'
+      });
+    }
+
+    const userData = { ...personaldata.dataValues, ...user.dataValues };
 
     if (userData) {
       return res.json({

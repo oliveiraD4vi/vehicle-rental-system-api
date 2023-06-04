@@ -3,7 +3,6 @@ const Vehicle = require('../../models/Vehicle');
 const { Op } = require("sequelize");
 const { authUser } = require('../../middlewares/auth');
 const { getRandomList } = require('../../services/vehicle');
-const Reservation = require('../../models/Reservation');
 
 module.exports = (app) => {
   app.put('/api/vehicle', async (req, res) => {

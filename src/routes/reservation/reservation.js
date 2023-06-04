@@ -2,8 +2,8 @@ const { Op } = require('sequelize');
 const { authUser } = require('../../middlewares/auth');
 
 const Reservation = require('../../models/Reservation');
-const User = require('../../models/User');
 const Vehicle = require('../../models/Vehicle');
+const User = require('../../models/User');
 
 module.exports = (app) => {
   app.post('/api/reservation', authUser, async (req, res) => {

@@ -52,6 +52,15 @@
                 "id": {
                   "example": "any"
                 },
+                "role": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "personalreq": {
+                  "example": "any"
+                },
                 "name": {
                   "example": "any"
                 },
@@ -80,12 +89,6 @@
                   "example": "any"
                 },
                 "country": {
-                  "example": "any"
-                },
-                "role": {
-                  "example": "any"
-                },
-                "email": {
                   "example": "any"
                 }
               }
