@@ -13,50 +13,53 @@ module.exports = (app) => {
 
     const data = req.body;
 
-    const user = await User.findByPk(data.id);
-
-    if (!user) {
-      return res.status(400).json({
-        error: true,
-        message: "Erro: Usuário não encontrado"
-      });
-    }
-
-    user.role = await data.role ? data.role : user.role;
-    user.email = await data.email ? data.email : user.email;
-
-    const personalData = await PersonalData.findOne({
-      where: {
-        id: data.personaldata_id
-      }
-    });
-
-    if (!personalData) {
-      return res.status(400).json({
-        error: true,
-        message: "Erro: Dados pessoais não encontrados"
-      });
-    }
-
-    personalData.name = await data.name ? data.name : personalData.name;
-    personalData.cpf = await data.cpf ? data.cpf : personalData.cpf;
-    personalData.bornAt = await data.bornAt ? data.bornAt : personalData.bornAt;
-    personalData.phone = await data.phone ? data.phone : personalData.phone;
-    personalData.street = await data.street ? data.street : personalData.street;
-    personalData.number = await data.number ? data.number : personalData.number;
-    personalData.neighborhood = await data.neighborhood ? data.neighborhood : personalData.neighborhood;
-    personalData.city = await data.city ? data.city : personalData.city;
-    personalData.state = await data.state ? data.state : personalData.state;
-    personalData.country = await data.country ? data.country : personalData.country;
-
     try {
-      personalData.save();
-      user.save();
-      
-      return res.json({
-        error: false,
-        message: 'Informações editadas com sucesso!'
+      const result = await sequelize.transaction(async (transaction) => {
+        const user = await User.findOne({
+          where: { id: data.id },
+          include: [PersonalData]
+        });
+
+        if (!user) {
+          return res.status(400).json({
+            error: true,
+            message: "Erro: Usuário não encontrado"
+          });
+        }
+
+        user.role = data.role || user.role;
+        user.email = data.email || user.email;
+
+        const personalData = user.PersonalData;
+
+        if (!personalData) {
+          return res.status(400).json({
+            error: true,
+            message: "Erro: Dados pessoais não encontrados"
+          });
+        }
+
+        personalData.name = data.name || personalData.name;
+        personalData.cpf = data.cpf || personalData.cpf;
+        personalData.bornAt = data.bornAt || personalData.bornAt;
+        personalData.phone = data.phone || personalData.phone;
+        personalData.street = data.street || personalData.street;
+        personalData.number = data.number || personalData.number;
+        personalData.neighborhood = data.neighborhood || personalData.neighborhood;
+        personalData.city = data.city || personalData.city;
+        personalData.state = data.state || personalData.state;
+        personalData.country = data.country || personalData.country;
+
+        await personalData.save({ transaction });
+        await user.save({ transaction });
+
+        return {
+          error: false,
+          message: 'Informações editadas com sucesso!'
+        };
       });
+
+      return res.json(result);
     } catch (error) {
       return res.status(400).json({
         error: true,
