@@ -81,7 +81,7 @@ module.exports = (app) => {
     const user = await User.findOne({
       attributes: ['id', 'personaldata_id'],
       where: {
-        personaldata_id: id,
+        id: id,
       }
     });
 
