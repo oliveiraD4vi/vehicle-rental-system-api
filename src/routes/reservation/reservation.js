@@ -267,45 +267,40 @@ module.exports = (app) => {
     // #swagger.tags = ['Reservation']
     // #swagger.description = 'Reservation listing endpoint'
 
-    let { page, size, sort, search } = req.query;
+    let { page = 1, size = 10, sort = 'ASC', search = '' } = req.query;
 
-    if (!page) page = 1;
-    if (!size) size = 10;
-    if (!sort) sort = 'ASC';
-    if (!search) search = '';
+    const pageNumber = parseInt(page);
+    const pageSize = parseInt(size);
+    const offset = (pageNumber - 1) * pageSize;
 
-    const limit = parseInt(size);
-    const offset = (parseInt(page)-1) * size;
+    try {
+      const [reservations, totalCount] = await Promise.all([
+        Reservation.findAll({
+          attributes: [
+            'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status', 'total_value'
+          ],
+          where: {
+            [Op.or]: [
+              { step: { [Op.iLike]: `%${search}%` } },
+              { status: { [Op.iLike]: `%${search}%` } },
+            ]
+          },
+          limit: pageSize,
+          offset,
+          order: [
+            ['id', sort],
+          ]
+        }),
+        Reservation.count({
+          where: {
+            [Op.or]: [
+              { step: { [Op.iLike]: `%${search}%` } },
+              { status: { [Op.iLike]: `%${search}%` } },
+            ]
+          }
+        })
+      ]);
 
-    const totalCount = (await Reservation.findAll({
-      attributes: ['step', 'status'],
-      where: {
-        [Op.or]: [
-          { step: { [Op.substring]: search } },
-          { status: { [Op.substring]: search } }
-        ]
-      }
-    })).length;
-
-    await Reservation.findAll({
-      attributes: [
-        'id', 'user_id', 'vehicle_id', 'pickup', 'devolution', 'step', 'status', 'total_value'
-      ],
-      where: {
-        [Op.or]: [
-          { step: { [Op.iLike]: `%${search}%` } },
-          { status: { [Op.iLike]: `%${search}%` } },
-          { pickup: { [Op.iLike]: `%${search}%` } },
-          { devolution: { [Op.iLike]: `%${search}%` } },
-        ]
-      },
-      limit,
-      offset,
-      order: [
-        ['id', sort],
-      ]
-    })
-    .then((reservations) => {
       if (reservations.length > 0) {
         return res.json({
           error: false,
@@ -313,18 +308,24 @@ module.exports = (app) => {
           totalCount
         });
       } else {
-        return res.status(404).json({
+        return res.sendStatus(404).json({
           error: true,
           reservations,
           message: 'Erro: Sem reservas registradas'
         });
       }
-    })
-    .catch(() => {
-      return res.status(500).json({
-        error: true,
-        message: 'Erro: Erro desconhecido'
-      });
-    });
+    } catch (error) {
+      if (error instanceof Sequelize.DatabaseError) {
+        return res.status(500).json({
+          error: true,
+          message: 'Erro: Erro no banco de dados'
+        });
+      } else {
+        return res.status(500).json({
+          error: true,
+          message: 'Erro: Erro desconhecido'
+        });
+      }
+    }
   });
 };
