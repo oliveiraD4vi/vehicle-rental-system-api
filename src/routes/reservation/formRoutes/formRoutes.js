@@ -254,11 +254,12 @@ module.exports = (app) => {
     }
 
     try {
-      await Reservation.create({ ...data, pickup: null, devolution: null });
+      const reservation = await Reservation.create({ ...data, pickup: null, devolution: null });
 
       return res.json({
         error: false,
-        message: 'Reserva criada com status PERSONAL'
+        message: 'Reserva criada com status PERSONAL',
+        reservation: reservation
       });
     } catch (error) {
       return res.status(400).json({
