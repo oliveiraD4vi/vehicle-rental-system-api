@@ -75,6 +75,7 @@ module.exports = (app) => {
     if (reservationList) {
       reservationList.forEach((reserva) => {
         if (
+          (reserva.id != reservationId) &&
           (new Date(pickup).getTime() > new Date(reserva.pickup).getTime()
             && new Date(pickup).getTime() < new Date(reserva.devolution).getTime()) ||
           (new Date(devolution).getTime() > new Date(reserva.pickup).getTime()
