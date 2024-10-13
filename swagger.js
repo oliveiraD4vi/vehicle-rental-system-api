@@ -19,7 +19,7 @@ const doc = {
   },
   host: process.env.DEFAULT_URL,
   basePath: "/",
-  schemes: ['http'],
+  schemes: ['https'],
   consumes: ['application/json'],
   produces: ['application/json'],
   tags: [
