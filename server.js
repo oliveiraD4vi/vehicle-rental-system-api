@@ -14,7 +14,7 @@ require('./src/routes/index')(app);
 require('./swagger.js');
 
 app.get('/', (req, res, next) => {
-    res.send('Hello VRS Application');
+  res.send('Hello VRS Application\n');
 });
 
 app.listen(process.env.PORT);
