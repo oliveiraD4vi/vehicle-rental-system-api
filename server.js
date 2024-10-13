@@ -13,4 +13,8 @@ require('./src/models/database');
 require('./src/routes/index')(app);
 require('./swagger.js');
 
+app.get('/', (req, res, next) => {
+    res.send('Hello VRS Application');
+});
+
 app.listen(process.env.PORT);
